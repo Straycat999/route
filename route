@@ -1,0 +1,43 @@
+
+class FacilityClustersRouteSet(FacilityRouteSet):
+    @classmethod
+    def get_url_prefix(cls) -> str:
+        # Возвращаем новый базовый путь для роутов в FacilityClustersRouteSet
+        return '/facility-clusters'
+
+    actions = ['action_list',]
+
+    @inject_make(CrudApiAction.LIST)
+    class InjectFacilityClustersParam:
+        zoom: Optional[float] = Query(None)
+        zoom_step: Optional[float] = Query(None)
+        guarantee_all_points_in_geohash: Optional[bool] = Query(False)
+        lon_1: Optional[float] = Query()
+        lat_1: Optional[float] = Query()
+        lon_2: Optional[float] = Query()
+        lat_2: Optional[float] = Query()
+        guarantee_all_points_in_geohash: Optional[bool] = Query(False)
+
+
+    # def get_queryset_for_list(self):
+    #     queryset = super().get_queryset_for_list()  # Получаем базовый QuerySet
+    #     print(queryset)
+    #
+    #     return queryset
+
+    def list(self):
+        queryset = self.get_queryset_for_list()
+        # return facility_clusters
+
+        clusters = facility_clusters(
+                self.inject.lon_1,
+                self.inject.lat_1,
+                self.inject.lon_2,
+                self.inject.lat_2,
+                self.inject.zoom,
+                self.inject.zoom_step,
+                queryset,
+                self.inject.guarantee_all_points_in_geohash,
+           )
+        return [{"relationships":"", "attributes": dict(contacts=clusters), "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6"}]
+
